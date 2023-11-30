@@ -11,12 +11,16 @@ const {
   _hideValuesForRecipient,
   _revealHiddenValues,
   _generateNewBliding,
+} = require("./utils/crypto.js");
+
+const {
   fetchNoteData,
   fetchPositionData,
   signMarginChange,
   findNoteCombinations,
   fetchOrderTabData,
-} = require("./Invisibl3UserUtils.js");
+  getActiveOrders,
+} = require("./utils/userData.js");
 
 const DUST_AMOUNT_PER_ASSET = {
   12345: 2500, // BTC ~ 5c
@@ -59,7 +63,6 @@ const {
   initDb,
 } = require("../utils/localStorage.js");
 const { restoreUserState } = require("../utils/keyRetrieval.js");
-const { getActiveOrders } = require("../utils/utils.js");
 
 /* global BigInt */
 

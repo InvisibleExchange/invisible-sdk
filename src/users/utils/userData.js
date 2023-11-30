@@ -1,16 +1,20 @@
-const bigInt = require("big-integer");
-const { pedersen, computeHashOnElements } = require("../utils/pedersen.js");
+const { computeHashOnElements } = require("../utils/pedersen.js");
 const { getKeyPair, sign } = require("starknet").ec;
 
-const { trimHash } = require("../transactions/stateStructs/Notes.js");
 const {
   fetchStoredPosition,
   fetchStoredNotes,
-  storePrivKey,
   fetchStoredTabs,
 } = require("../utils/firebase/firebaseConnection.js");
 
 /* global BigInt */
+
+
+
+
+
+// ! ==============================================================================
+// ! ==============================================================================
 
 async function fetchNoteData(keyPairs, privateSeed) {
   // priv keys that don't point to a note stored in the database
@@ -152,7 +156,7 @@ async function fetchOrderTabData(addressData, privateSeed) {
   return { emptyTabPrivKeys, orderTabData, tabPrivKeys, error };
 }
 
-// *
+// * ==============================================================================
 function signMarginChange(
   direction,
   marginChange,
@@ -195,72 +199,30 @@ function signMarginChange(
   }
 }
 
-// ! CRYPTO HELPERS
-function _subaddressPrivKeys(privSpendKey, privViewKey, randSeed) {
-  // //ksi = ks + H(kv, i)
-  // //kvi = kv + H(ks, i)
+// * ==============================================================================
+async function getActiveOrders(order_ids, perp_order_ids) {
+  return await axios
+    .post(`${EXPRESS_APP_URL}/get_orders`, { order_ids, perp_order_ids })
+    .then((res) => {
+      let order_response = res.data.response;
 
-  const ksi = trimHash(pedersen([privSpendKey, randSeed]), 240);
-  const kvi = trimHash(pedersen([privViewKey, randSeed]), 240);
+      let badOrderIds = order_response.bad_order_ids;
+      let orders = order_response.orders;
+      let badPerpOrderIds = order_response.bad_perp_order_ids;
+      let perpOrders = order_response.perp_orders;
+      let pfrNotes = order_response.pfr_notes
+        ? order_response.pfr_notes.map((n) => Note.fromGrpcObject(n))
+        : [];
 
-  return { ksi, kvi };
+      return { badOrderIds, orders, badPerpOrderIds, perpOrders, pfrNotes };
+    })
+    .catch((err) => {
+      console.log(err);
+      throw err;
+    });
 }
 
-function _oneTimeAddressPrivKey(Kvi, ks, count) {
-  // ko = H(count , Kvi.x) + ks
-  let h = trimHash(pedersen([count, BigInt(Kvi.getX())]), 240);
-
-  return h + ks;
-}
-
-// Each output of a transaction should have this hiding
-function _hideValuesForRecipient(Ko, amount, privateSeed) {
-  // Todo: should replace Ko with Kv so someone can reveal their trades without revealing their private keys
-  // r is the transaction priv key (randomly generated)
-  // yt = H("comm_mask", H(rKv, t))  (NOTE: t is used to make the values unique and we are omitting it for now)
-  // amount_t = bt XOR8 yt -> (where bt is the 64 bit amount of the note)
-
-  //todo: might add an index to the blinding like:
-  //todo|    - yt0 = H(Ko.X, privateSeed)
-  //todo|    - yt1 = H(yto, 1), yt2 = H(yt1, 2), yt3 = H(yt2, 3), ...
-  //todo| this allows as to create different blindings for two notes with the same address
-
-  let yt = pedersen([BigInt(Ko.getX()), privateSeed]); // this is the blinding used in the commitment
-
-  // Todo: Should adjust the amount to be at least 40-50 bits
-  // ! If the amount is less than 40 bits then the first 20+ bits of the blinding are revealed
-  // ! Either that or trim blinding to less bits
-  let hash8 = trimHash(yt, 64);
-  let hiddentAmount = bigInt(amount).xor(hash8).value;
-
-  return { yt, hiddentAmount };
-}
-
-function _generateNewBliding(Ko, privateSeed) {
-  let yt = pedersen([BigInt(Ko), privateSeed]);
-
-  return yt;
-}
-
-function _revealHiddenValues(Ko, privateSeed, hiddentAmount, commitment) {
-  let yt = pedersen([BigInt(Ko.getX()), privateSeed]);
-  let hash8 = trimHash(yt, 64);
-  let bt = bigInt(hiddentAmount).xor(hash8).value;
-
-  if (pedersen([bt, yt]) != commitment) {
-    throw "Invalid amount and blinding";
-  }
-
-  return { yt, bt };
-}
-
-function _checkOwnership(Ks, Kv, Ko, kv, token, count) {
-  let { _, kvi } = _subaddressPrivKeys(0, kv, token);
-  let Kvi = getKeyPair(kvi.toString(16)).getPublic();
-
-  // Todo: finsih this function
-}
-
+// * ==============================================================================
 async function handlePfrNoteData(
   userId,
   pfrKey,
@@ -318,42 +280,11 @@ function findNoteCombinations(notesData, target, dustAmount) {
 }
 
 module.exports = {
-  _subaddressPrivKeys,
-  _oneTimeAddressPrivKey,
-  _generateNewBliding,
-  _hideValuesForRecipient,
-  _revealHiddenValues,
-  _checkOwnership,
   fetchNoteData,
   fetchPositionData,
   fetchOrderTabData,
   signMarginChange,
   handlePfrNoteData,
   findNoteCombinations,
+  getActiveOrders,
 };
-
-// & The generation of addresses
-// User generates Ks and Kv as the original private public key pair (useful for revealing his history if necessary)
-
-// Generates Kvi view key subaddresses for each token along with corresponding priv_keys (ksi)
-
-// Generate a one time address for a note as such:
-// count = num of notes/addresses generated for this token (used as the txR - making the addresses unique)
-// Ko = H(count, Kvi)G + Ks
-
-// & To prove ownership one needs: Ks, Kv, Ko, and kv:
-// - first generate the Kvi with Kv,kv for that token
-// - then generate Ks' = Ko - H(count, Kvi)G
-// - check if Ks' == Ks
-
-// & To find your own notes for token X:
-// get Kvi
-// addresses = []
-
-// for i in NUM_TRADES:
-// 	Ko = H(i, Kvi) + Ks
-// 	addresses.append(Ko)
-
-// loop over all notes onchain:
-// 	check if note.address is in addresses:
-// 		if so then its yours

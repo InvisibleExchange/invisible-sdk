@@ -6,6 +6,7 @@ const SERVER_URL = "localhost";
 // const SERVER_URL = "54.212.28.196";
 
 const EXCHANGE_CONFIG = require("../../exchange-config.json");
+const { getActiveOrders } = require("../users/utils/userData");
 
 const SYMBOLS_TO_IDS = EXCHANGE_CONFIG["SYMBOLS_TO_IDS"];
 const IDS_TO_SYMBOLS = EXCHANGE_CONFIG["IDS_TO_SYMBOLS"];
@@ -518,28 +519,6 @@ async function loginUser(signer) {
   return user;
 }
 
-async function getActiveOrders(order_ids, perp_order_ids) {
-  return await axios
-    .post(`${EXPRESS_APP_URL}/get_orders`, { order_ids, perp_order_ids })
-    .then((res) => {
-      let order_response = res.data.response;
-
-      let badOrderIds = order_response.bad_order_ids;
-      let orders = order_response.orders;
-      let badPerpOrderIds = order_response.bad_perp_order_ids;
-      let perpOrders = order_response.perp_orders;
-      let pfrNotes = order_response.pfr_notes
-        ? order_response.pfr_notes.map((n) => Note.fromGrpcObject(n))
-        : [];
-
-      return { badOrderIds, orders, badPerpOrderIds, perpOrders, pfrNotes };
-    })
-    .catch((err) => {
-      console.log(err);
-      throw err;
-    });
-}
-
 //
 
 //
@@ -565,7 +544,6 @@ module.exports = {
   handleNoteSplit,
   handleFillResult,
   handleLiquidityUpdate,
-  getActiveOrders,
   fetchLiquidity,
   loginUser,
   SYMBOLS_TO_IDS,
