@@ -59,6 +59,7 @@ const {
   initDb,
 } = require("../utils/localStorage.js");
 const { restoreUserState } = require("../utils/keyRetrieval.js");
+const { getActiveOrders } = require("../utils/utils.js");
 
 /* global BigInt */
 
