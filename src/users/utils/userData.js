@@ -1,17 +1,16 @@
-const { computeHashOnElements } = require("../utils/pedersen.js");
+const { computeHashOnElements } = require("../../utils/pedersen.js");
+const { EXPRESS_APP_URL } = require("../../utils/utils.js");
+
 const { getKeyPair, sign } = require("starknet").ec;
 
 const {
   fetchStoredPosition,
   fetchStoredNotes,
   fetchStoredTabs,
-} = require("../utils/firebase/firebaseConnection.js");
+} = require("../../utils/firebase/firebaseConnection.js");
+const axios = require("axios");
 
 /* global BigInt */
-
-
-
-
 
 // ! ==============================================================================
 // ! ==============================================================================
@@ -202,7 +201,10 @@ function signMarginChange(
 // * ==============================================================================
 async function getActiveOrders(order_ids, perp_order_ids) {
   return await axios
-    .post(`${EXPRESS_APP_URL}/get_orders`, { order_ids, perp_order_ids })
+    .post(`${EXPRESS_APP_URL}/get_orders`, {
+      order_ids,
+      perp_order_ids,
+    })
     .then((res) => {
       let order_response = res.data.response;
 

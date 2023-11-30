@@ -1,8 +1,8 @@
 const bigInt = require("big-integer");
-const { pedersen } = require("../utils/pedersen.js");
+const { pedersen } = require("../../utils/pedersen.js");
 const { getKeyPair } = require("starknet").ec;
 
-const { trimHash } = require("../transactions/stateStructs/Notes.js");
+const { trimHash } = require("../../transactions/stateStructs/Notes.js");
 
 // ! CRYPTO HELPERS
 function _subaddressPrivKeys(privSpendKey, privViewKey, randSeed) {

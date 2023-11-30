@@ -531,6 +531,7 @@ async function loginUser(signer) {
 
 module.exports = {
   SERVER_URL,
+  EXPRESS_APP_URL,
   DECIMALS_PER_ASSET,
   PRICE_DECIMALS_PER_ASSET,
   DUST_AMOUNT_PER_ASSET,
