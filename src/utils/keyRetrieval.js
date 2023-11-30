@@ -1,5 +1,3 @@
-const UserState = require("../users/Invisibl3User");
-
 const EXCHANGE_CONFIG = require("../../exchange-config.json");
 
 const PRICE_DECIMALS_PER_ASSET = EXCHANGE_CONFIG["PRICE_DECIMALS_PER_ASSET"];

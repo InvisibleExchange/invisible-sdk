@@ -9,9 +9,9 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "exports": {
-    "./users": "./src/users/index.js",
-    "./transactions": "./src/transactions/index.js",
-    "./utils": "./src/utils/index.js",
+    "./src/users": "./src/users/index.js",
+    "./src/transactions": "./src/transactions/index.js",
+    "./src/utils": "./src/utils/index.js",
     ".": "./src/index.js"
   },
   "dependencies": {
