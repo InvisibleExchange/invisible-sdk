@@ -123,7 +123,7 @@ function handleLiquidityUpdate(
   perpLiquidity,
   setPerpLiquidity
 ) {
-  for (let update of result.liquidity_updates) {
+  for (let update of result.liquidity) {
     let askQueue = update.ask_liquidity.map((item) => {
       return {
         price: item[0],
@@ -529,7 +529,6 @@ module.exports = {
   handleLiquidityUpdate,
   fetchLiquidity,
   loginUser,
-  loginUserInner,
   SYMBOLS_TO_IDS,
   IDS_TO_SYMBOLS,
   CHAIN_IDS,

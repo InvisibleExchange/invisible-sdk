@@ -10,6 +10,8 @@ const {
 const axios = require("axios");
 
 const EXCHANGE_CONFIG = require("../../../exchange-config.json");
+const { _generateNewBliding } = require("./crypto.js");
+const { Note } = require("../../transactions/stateStructs/Notes.js");
 
 const SERVER_URL = EXCHANGE_CONFIG["SERVER_URL"];
 const EXPRESS_APP_URL = `http://${SERVER_URL}:4000`;
@@ -130,7 +132,7 @@ async function fetchOrderTabData(addressData, privateSeed) {
       BigInt(privateSeed) + 2n
     );
 
-    fetchStoredTabs(addr, baseBlinding, quoteBlinding)
+    return fetchStoredTabs(addr, baseBlinding, quoteBlinding)
       .then((tabs) => {
         if (!tabs || tabs.length == 0) {
           emptyTabPrivKeys.push(privKey);

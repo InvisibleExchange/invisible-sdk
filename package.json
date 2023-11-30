@@ -1,6 +1,6 @@
 {
   "name": "invisible-sdk",
-  "version": "1.3.10",
+  "version": "1.3.12",
   "description": "sdk for interacting with invisible exchange",
   "main": "src/index.js",
   "license": "MIT",
