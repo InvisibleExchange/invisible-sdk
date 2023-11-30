@@ -1,5 +1,4 @@
 const { computeHashOnElements } = require("../../utils/pedersen.js");
-const { EXPRESS_APP_URL } = require("../../utils/utils.js");
 
 const { getKeyPair, sign } = require("starknet").ec;
 
@@ -9,6 +8,11 @@ const {
   fetchStoredTabs,
 } = require("../../utils/firebase/firebaseConnection.js");
 const axios = require("axios");
+
+const EXCHANGE_CONFIG = require("../../../exchange-config.json");
+
+const SERVER_URL = EXCHANGE_CONFIG["SERVER_URL"];
+const EXPRESS_APP_URL = `http://${SERVER_URL}:4000`;
 
 /* global BigInt */
 

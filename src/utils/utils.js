@@ -6,7 +6,6 @@ const SERVER_URL = "localhost";
 // const SERVER_URL = "54.212.28.196";
 
 const EXCHANGE_CONFIG = require("../../exchange-config.json");
-const { getActiveOrders } = require("../users/utils/userData");
 
 const SYMBOLS_TO_IDS = EXCHANGE_CONFIG["SYMBOLS_TO_IDS"];
 const IDS_TO_SYMBOLS = EXCHANGE_CONFIG["IDS_TO_SYMBOLS"];
@@ -498,23 +497,7 @@ async function loginUser(signer) {
 
   let pk = keyDerivation.getPrivateKeyFromEthSignature(sig);
 
-  let user = UserState.fromPrivKey(pk);
-
-  let { emptyPrivKeys, emptyPositionPrivKeys, emptyTabPrivKeys } =
-    await user.login();
-
-  let { badOrderIds, orders, badPerpOrderIds, perpOrders, pfrNotes } =
-    await getActiveOrders(user.orderIds, user.perpetualOrderIds);
-
-  await user.handleActiveOrders(
-    badOrderIds,
-    orders,
-    badPerpOrderIds,
-    perpOrders,
-    pfrNotes,
-    emptyPrivKeys,
-    emptyPositionPrivKeys
-  );
+  let user = UserState.loginUser(pk);
 
   return user;
 }
@@ -531,7 +514,6 @@ async function loginUser(signer) {
 
 module.exports = {
   SERVER_URL,
-  EXPRESS_APP_URL,
   DECIMALS_PER_ASSET,
   PRICE_DECIMALS_PER_ASSET,
   DUST_AMOUNT_PER_ASSET,
@@ -547,6 +529,7 @@ module.exports = {
   handleLiquidityUpdate,
   fetchLiquidity,
   loginUser,
+  loginUserInner,
   SYMBOLS_TO_IDS,
   IDS_TO_SYMBOLS,
   CHAIN_IDS,
