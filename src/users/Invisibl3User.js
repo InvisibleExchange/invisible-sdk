@@ -170,7 +170,7 @@ module.exports = class UserState {
       this.privateSeed
     );
     if (error) {
-      restoreUserState(this, true, false).catch(console.log);
+      await restoreUserState(this, true, false).catch(console.log);
     }
 
     // ? Get Position Data ============================================
@@ -188,7 +188,7 @@ module.exports = class UserState {
       error: error2,
     } = await fetchPositionData(addressData);
     if (error2) {
-      restoreUserState(this, false, true).catch(console.log);
+      await restoreUserState(this, false, true).catch(console.log);
     }
 
     // ? Get Position Data ============================================
@@ -356,7 +356,7 @@ module.exports = class UserState {
 
     this.noteData = noteDataNew;
 
-    storeUserState(this.db, this);
+    await storeUserState(this.db, this).catch(console.log);
   }
 
   //* GENERATE ORDERS  ==========================================================
@@ -492,7 +492,7 @@ module.exports = class UserState {
     let _signature = perpOrder.signOrder(privKeys, positionPrivKey);
 
     // ? Store the userData locally
-    storeUserState(this.db, this);
+    storeUserState(this.db, this).catch(console.log);
 
     return { perpOrder, pfrKey: privKeySum };
   }
@@ -556,7 +556,7 @@ module.exports = class UserState {
     let _sig = perpOrder.signOrder(privKeys);
 
     // ? Store the userData locally
-    storeUserState(this.db, this);
+    storeUserState(this.db, this).catch(console.log);
 
     return perpOrder;
   }
@@ -650,7 +650,7 @@ module.exports = class UserState {
     let _sig = limitOrder.signOrder(privKey);
 
     // ? Store the userData locally
-    storeUserState(this.db, this);
+    storeUserState(this.db, this).catch(console.log);
 
     return limitOrder;
   }
@@ -687,7 +687,7 @@ module.exports = class UserState {
     );
 
     // ? Store the userData locally
-    storeUserState(this.db, this);
+    storeUserState(this.db, this).catch(console.log);
 
     return deposit;
   }
@@ -738,7 +738,7 @@ module.exports = class UserState {
     );
 
     // ? Store the userData locally
-    storeUserState(this.db, this);
+    storeUserState(this.db, this).catch(console.log);
 
     return withdrawal;
   }
@@ -847,7 +847,7 @@ module.exports = class UserState {
       );
 
       // ? Store the userData locally
-      storeUserState(this.db, this);
+      storeUserState(this.db, this).catch(console.log);
     } else throw Error("Invalid direction");
 
     return {

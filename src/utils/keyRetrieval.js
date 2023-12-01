@@ -147,7 +147,7 @@ async function restoreUserState(
     user.tabPrivKeys = tabPrivKeys;
   }
 
-  storeUserState(user.db, user);
+  await storeUserState(user.db, user);
 }
 
 module.exports = { restoreUserState };

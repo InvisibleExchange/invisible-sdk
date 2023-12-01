@@ -49,8 +49,7 @@ function storeUserState(db, user) {
   let positionCounts = JSON.stringify(user.positionCounts);
   let orderTabCounts = JSON.stringify(user.orderTabCounts);
 
-  // Update the state in the database
-  try {
+  return new Promise((resolve, reject) => {
     db.run(
       `INSERT OR REPLACE INTO user_data (
         userId,
@@ -72,14 +71,19 @@ function storeUserState(db, user) {
         noteCounts,
         positionCounts,
         orderTabCounts,
-      ]
+      ],
+      (err, _) => {
+        if (err) {
+          console.error(err.message);
+          reject(err);
+        }
+        resolve();
+      }
     );
-  } catch (e) {
-    console.log(e);
-  }
+  });
 }
 
-async function getUserState(db, userId) {
+function getUserState(db, userId) {
   //
   userId = userId.toString();
 
