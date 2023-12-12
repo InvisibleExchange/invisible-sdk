@@ -1,4 +1,4 @@
-const { pedersen, computeHashOnElements } = require("../../utils/pedersen");
+const { hash2, computeHashOnElements } = require("../../utils/crypto_hash");
 const { getKeyPair, sign } = require("starknet").ec;
 
 //* =============================================================================
@@ -32,18 +32,15 @@ class OrderTab {
     quote_amount,
     vlpSupply
   ) {
-    let base_commitment = pedersen([
-      BigInt(base_amount),
-      BigInt(base_blinding),
-    ]);
-    let quote_commitment = pedersen([
+    let base_commitment = hash2([BigInt(base_amount), BigInt(base_blinding)]);
+    let quote_commitment = hash2([
       BigInt(quote_amount),
       BigInt(quote_blinding),
     ]);
 
     let blindingSum = BigInt(base_blinding) / 2n + BigInt(quote_blinding) / 2n;
     let vlpSupplyCommitment =
-      vlpSupply > 0 ? pedersen(BigInt(vlpSupply), blindingSum) : 0n;
+      vlpSupply > 0 ? hash2(BigInt(vlpSupply), blindingSum) : 0n;
 
     let hashInputs = [
       header_hash,

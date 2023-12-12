@@ -1,4 +1,4 @@
-const { computeHashOnElements } = require("../../utils/pedersen.js");
+const { computeHashOnElements } = require("../../utils/crypto_hash.js");
 
 const { getKeyPair, sign } = require("starknet").ec;
 

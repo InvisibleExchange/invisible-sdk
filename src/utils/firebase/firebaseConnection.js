@@ -15,7 +15,7 @@ const {
 const bigInt = require("big-integer");
 
 const { Note, trimHash } = require("../../transactions/stateStructs/Notes.js");
-const { pedersen } = require("../pedersen.js");
+const { hash2 } = require("../crypto_hash.js");
 
 const { ec } = require("starknet").ec; //require("starknet/utils/ellipticCurve.js");
 
@@ -74,13 +74,13 @@ async function fetchStoredNotes(address, blinding) {
       })
       .getPublic();
 
-    // let yt = pedersen([BigInt(addr.getX()), privateSeed]);
+    // let yt = hash2([BigInt(addr.getX()), privateSeed]);
     let hash8 = trimHash(blinding, 64);
     let amount = Number.parseInt(
       bigInt(noteData.hidden_amount).xor(hash8).value
     );
 
-    if (pedersen([BigInt(amount), blinding]) != noteData.commitment) {
+    if (hash2([BigInt(amount), blinding]) != noteData.commitment) {
       throw "Invalid amount and blinding";
     }
 
@@ -221,9 +221,7 @@ async function fetchStoredTabs(address, baseBlinding, quoteBlinding) {
       bigInt(tabData.base_hidden_amount).xor(base_hash8).value
     );
 
-    if (
-      pedersen([BigInt(baseAmount), baseBlinding]) != tabData.base_commitment
-    ) {
+    if (hash2([BigInt(baseAmount), baseBlinding]) != tabData.base_commitment) {
       throw "Invalid base amount and blinding";
     }
 
@@ -232,7 +230,7 @@ async function fetchStoredTabs(address, baseBlinding, quoteBlinding) {
       bigInt(tabData.quote_hidden_amount).xor(quote_hash8).value
     );
     if (
-      pedersen([BigInt(quoteAmount), quoteBlinding]) != tabData.quote_commitment
+      hash2([BigInt(quoteAmount), quoteBlinding]) != tabData.quote_commitment
     ) {
       throw "Invalid quote amount and blinding";
     }
@@ -249,8 +247,7 @@ async function fetchStoredTabs(address, baseBlinding, quoteBlinding) {
       );
 
       if (
-        pedersen([BigInt(vlpSupply), blindingSum]) !=
-        tabData.vlp_supply_commitment
+        hash2([BigInt(vlpSupply), blindingSum]) != tabData.vlp_supply_commitment
       ) {
         throw "Invalid vlp amount and blinding";
       }

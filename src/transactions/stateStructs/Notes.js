@@ -1,4 +1,4 @@
-const { pedersen, computeHashOnElements } = require("../../utils/pedersen");
+const { hash2, computeHashOnElements } = require("../../utils/crypto_hash");
 const bigInt = require("big-integer");
 const { ec, getKeyPair } = require("starknet").ec;
 const BN = require("bn.js");
@@ -48,7 +48,7 @@ class Note {
   }
 
   getCommitment() {
-    return pedersen([BigInt(this.amount), this.blinding]);
+    return hash2([BigInt(this.amount), this.blinding]);
   }
 
   static fromGrpcObject(noteObject) {

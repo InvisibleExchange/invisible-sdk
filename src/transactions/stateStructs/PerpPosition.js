@@ -1,5 +1,4 @@
-const { pedersen, computeHashOnElements } = require("../../utils/pedersen");
-const { getKeyPair, sign } = require("starknet").ec;
+const { computeHashOnElements } = require("../../utils/crypto_hash");
 
 //* =============================================================================
 //* ORDER TABS

@@ -2,7 +2,7 @@ const {
   LiquidationOrder,
 } = require("../transactions/orderStructs/LiquidationOrder");
 
-const { pedersen, computeHashOnElements } = require("../utils/pedersen.js");
+const { hash2, computeHashOnElements } = require("../utils/crypto_hash.js");
 const { sign, getKeyPair } = require("starknet").ec;
 
 const {
@@ -1213,7 +1213,7 @@ module.exports = class UserState {
 
   _getDepositStarkPrivKey(depositToken) {
     // TODO: This is a temporary function to get the deposit stark key
-    return pedersen([this.privateSeed, depositToken]);
+    return hash2([this.privateSeed, depositToken]);
   }
 
   //* HELPERS ===========================================================================
@@ -1228,17 +1228,17 @@ module.exports = class UserState {
       case "note":
         let noteSeedRandomness =
           328965294021249504871258328423859990890523432589236523n;
-        seed = pedersen([noteSeedRandomness, token]);
+        seed = hash2([noteSeedRandomness, token]);
         break;
       case "position":
         let positionSeedRandomness =
           87311195862357333589832472352389732849239571003295829n;
-        seed = pedersen([positionSeedRandomness, token]);
+        seed = hash2([positionSeedRandomness, token]);
         break;
       case "order_tab":
         let orderTabSeedRandomness =
           3289651004221748755344442085963285230025892366052333n;
-        seed = pedersen([orderTabSeedRandomness, token]);
+        seed = hash2([orderTabSeedRandomness, token]);
         break;
 
       default:
@@ -1303,11 +1303,11 @@ module.exports = class UserState {
 
       // & Generates a privViewKey and privSpendKey from one onchain private key and generates a user from it
       let privViewKey = trimHash(
-        pedersen([VIEW_KEY_MASK, BigInt(privKey, 16)]),
+        hash2([VIEW_KEY_MASK, BigInt(privKey, 16)]),
         240
       );
       let privSpendKey = trimHash(
-        pedersen([SPEND_KEY_MASK, BigInt(privKey, 16)]),
+        hash2([SPEND_KEY_MASK, BigInt(privKey, 16)]),
         240
       );
 

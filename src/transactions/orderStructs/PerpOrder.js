@@ -1,5 +1,5 @@
 const { getKeyPair, sign } = require("starknet").ec;
-const { computeHashOnElements, pedersen } = require("../../utils/pedersen");
+const { computeHashOnElements, hash2 } = require("../../utils/crypto_hash");
 
 /* global BigInt */
 class PerpOrder {
@@ -88,7 +88,7 @@ class PerpOrder {
 
       let fields_hash = this.open_order_fields.hash();
 
-      return pedersen([order_hash, fields_hash]);
+      return hash2([order_hash, fields_hash]);
     } else if (pos_effect_type_int == 2) {
       if (!this.close_order_fields) {
         throw "close_order_fields not defined in close order";
@@ -96,7 +96,7 @@ class PerpOrder {
 
       let fields_hash = this.close_order_fields.hash();
 
-      let h = pedersen([order_hash, fields_hash]);
+      let h = hash2([order_hash, fields_hash]);
 
       return h;
     } else {
@@ -234,7 +234,7 @@ class CloseOrderFields {
   }
 
   hash() {
-    return pedersen([
+    return hash2([
       BigInt(this.dest_received_address.getX()),
       this.dest_received_blinding,
     ]);

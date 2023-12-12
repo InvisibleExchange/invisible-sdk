@@ -1,5 +1,5 @@
 const bigInt = require("big-integer");
-const { pedersen } = require("../../utils/pedersen.js");
+const { hash2 } = require("../../utils/crypto_hash.js");
 const { getKeyPair } = require("starknet").ec;
 
 const { trimHash } = require("../../transactions/stateStructs/Notes.js");
@@ -9,15 +9,15 @@ function _subaddressPrivKeys(privSpendKey, privViewKey, randSeed) {
   // //ksi = ks + H(kv, i)
   // //kvi = kv + H(ks, i)
 
-  const ksi = trimHash(pedersen([privSpendKey, randSeed]), 240);
-  const kvi = trimHash(pedersen([privViewKey, randSeed]), 240);
+  const ksi = trimHash(hash2([privSpendKey, randSeed]), 240);
+  const kvi = trimHash(hash2([privViewKey, randSeed]), 240);
 
   return { ksi, kvi };
 }
 
 function _oneTimeAddressPrivKey(Kvi, ks, count) {
   // ko = H(count , Kvi.x) + ks
-  let h = trimHash(pedersen([count, BigInt(Kvi.getX())]), 240);
+  let h = trimHash(hash2([count, BigInt(Kvi.getX())]), 240);
 
   return h + ks;
 }
@@ -34,7 +34,7 @@ function _hideValuesForRecipient(Ko, amount, privateSeed) {
   //todo|    - yt1 = H(yto, 1), yt2 = H(yt1, 2), yt3 = H(yt2, 3), ...
   //todo| this allows as to create different blindings for two notes with the same address
 
-  let yt = pedersen([BigInt(Ko.getX()), privateSeed]); // this is the blinding used in the commitment
+  let yt = hash2([BigInt(Ko.getX()), privateSeed]); // this is the blinding used in the commitment
 
   // Todo: Should adjust the amount to be at least 40-50 bits
   // ! If the amount is less than 40 bits then the first 20+ bits of the blinding are revealed
@@ -46,17 +46,17 @@ function _hideValuesForRecipient(Ko, amount, privateSeed) {
 }
 
 function _generateNewBliding(Ko, privateSeed) {
-  let yt = pedersen([BigInt(Ko), privateSeed]);
+  let yt = hash2([BigInt(Ko), privateSeed]);
 
   return yt;
 }
 
 function _revealHiddenValues(Ko, privateSeed, hiddentAmount, commitment) {
-  let yt = pedersen([BigInt(Ko.getX()), privateSeed]);
+  let yt = hash2([BigInt(Ko.getX()), privateSeed]);
   let hash8 = trimHash(yt, 64);
   let bt = bigInt(hiddentAmount).xor(hash8).value;
 
-  if (pedersen([bt, yt]) != commitment) {
+  if (hash2([bt, yt]) != commitment) {
     throw "Invalid amount and blinding";
   }
 

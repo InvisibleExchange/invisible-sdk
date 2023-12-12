@@ -1,5 +1,5 @@
 const { restoreUserState } = require("./keyRetrieval");
-const { pedersen, computeHashOnElements } = require("./pedersen");
+const { hash2, computeHashOnElements } = require("./crypto_hash");
 const {
   SERVER_URL,
   DECIMALS_PER_ASSET,
@@ -30,7 +30,7 @@ const { getLiquidatablePositions } = require("./firebase/firebaseConnection");
 
 module.exports = {
   restoreUserState,
-  pedersen,
+  hash2,
   computeHashOnElements,
   SERVER_URL,
   DECIMALS_PER_ASSET,

@@ -1,7 +1,7 @@
 // Import the Rust-generated WebAssembly package
-const starkwareCryptoSys = require("../../pedersen_pkg/starknet");
+const starkwareCryptoSys = require("../../poseidon_pkg/poseidon");
 
-function pedersen(vec2) {
+function hash2(vec2) {
   let h = starkwareCryptoSys.poseidon_hash_js(
     vec2[0].toString(),
     vec2[1].toString()
@@ -18,7 +18,7 @@ function computeHashOnElements(arr) {
   return BigInt(h);
 }
 
-module.exports = { pedersen, computeHashOnElements };
+module.exports = { hash2, computeHashOnElements };
 
 // const { pedersenHashBinding, pedersenHashOnVecBinding } = require("./FFI");
 // const starknet_hash_utils = require("starknet");

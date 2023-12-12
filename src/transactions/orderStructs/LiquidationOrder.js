@@ -1,5 +1,5 @@
 const { getKeyPair, sign } = require("starknet").ec;
-const { computeHashOnElements, pedersen } = require("../../utils/pedersen");
+const { computeHashOnElements } = require("../../utils/crypto_hash");
 
 /* global BigInt */
 class LiquidationOrder {

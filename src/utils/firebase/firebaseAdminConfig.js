@@ -13,7 +13,7 @@ const {
 const serviceAccount = require("./testing-account-json.json");
 // const serviceAccount = require("./invisible.json");
 
-const { computeHashOnElements } = require("../pedersen");
+const { computeHashOnElements } = require("../crypto_hash");
 
 initializeApp({
   credential: cert(serviceAccount),
