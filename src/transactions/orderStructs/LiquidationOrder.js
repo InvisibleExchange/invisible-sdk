@@ -23,17 +23,7 @@ class LiquidationOrder {
   }
 
   hashOrder() {
-    let order_side;
-    switch (this.order_side) {
-      case "Long":
-        order_side = 1n;
-        break;
-      case "Short":
-        order_side = 0n;
-        break;
-      default:
-        throw "invalid order side (should be binary)";
-    }
+    let order_side = order_side == "Long";
 
     let position_address = this.position.position_header.position_address;
     let fields_hash = this.open_order_fields.hash();
@@ -69,22 +59,11 @@ class LiquidationOrder {
   }
 
   toGrpcObject() {
-    let order_side;
-    switch (this.order_side) {
-      case "Long":
-        order_side = 1;
-        break;
-      case "Short":
-        order_side = 0;
-        break;
-
-      default:
-        throw "invalid position effect type";
-    }
+    let order_side = order_side == "Long";
 
     let open_order_fields = this.open_order_fields.toGrpcObject();
 
-    this.position.order_side = this.position.order_side == "Long" ? 1 : 0;
+    this.position.order_side = this.position.order_side == "Long";
 
     return {
       position: this.position,

@@ -2,9 +2,6 @@ const axios = require("axios");
 const UserState = require("../users/Invisibl3User").default;
 const { Note, trimHash } = require("../transactions/stateStructs/Notes");
 
-const SERVER_URL = "localhost";
-// const SERVER_URL = "54.212.28.196";
-
 const EXCHANGE_CONFIG = require("../../exchange-config.json");
 
 const SYMBOLS_TO_IDS = EXCHANGE_CONFIG["SYMBOLS_TO_IDS"];
@@ -32,7 +29,8 @@ const SPOT_MARKET_IDS_2_TOKENS = EXCHANGE_CONFIG["SPOT_MARKET_IDS_2_TOKENS"];
 
 const PERP_MARKET_IDS_2_TOKENS = EXCHANGE_CONFIG["PERP_MARKET_IDS_2_TOKENS"];
 
-const EXPRESS_APP_URL = `http://${SERVER_URL}:4000`;
+const SERVER_URL = EXCHANGE_CONFIG["SERVER_URL"];
+const EXPRESS_APP_URL = EXCHANGE_CONFIG["EXPRESS_APP_URL"];
 
 function get_max_leverage(token, amount) {
   let [min_bound, max_bound] = LEVERAGE_BOUNDS_PER_ASSET[token];

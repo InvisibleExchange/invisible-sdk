@@ -53,9 +53,7 @@ class PerpPosition {
   ) {
     // & hash = H({header_hash, order_side, position_size, entry_price, liquidation_price, current_funding_idx, vlp_supply})
 
-    if (typeof order_side === "string") {
-      order_side = order_side === "Long" ? 1n : 0n;
-    }
+    order_side = order_side == "Long";
     let hashInputs = [
       header_hash,
       order_side,
@@ -122,14 +120,13 @@ class PositionHeader {
     this.hash = this.hash();
   }
 
-  // & hash = H({allow_partial_liquidations, synthetic_token, position_address,  vlp_token, max_vlp_supply})
+  // & hash = H({allow_partial_liquidations, synthetic_token, position_address,  vlp_token * 2**32 + max_vlp_supply})
   hash() {
     let hashInputs = [
       this.allow_partial_liquidations ? 1n : 0n,
       this.synthetic_token,
       this.position_address,
-      this.vlp_token,
-      this.max_vlp_supply,
+      this.vlp_token * 2n ** 32n + this.max_vlp_supply,
     ];
 
     return computeHashOnElements(hashInputs);

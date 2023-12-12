@@ -6,8 +6,8 @@ engine.proto
 
 .env
 
-src/helpers/firebase
-!src/helpers/firebase/firebaseConnection.js
+src/utils/firebase
+!src/utils/firebase/firebaseConnection.js
 
 user_info.db
 

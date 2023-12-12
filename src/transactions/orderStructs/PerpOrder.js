@@ -32,18 +32,7 @@ class PerpOrder {
   }
 
   hashOrder() {
-    let order_side;
-
-    switch (this.order_side) {
-      case "Long":
-        order_side = 1n;
-        break;
-      case "Short":
-        order_side = 0n;
-        break;
-      default:
-        throw "invalid order side (should be binary)";
-    }
+    let order_side = order_side == "Long";
 
     let pos_effect_type_int;
     switch (this.position_effect_type) {
@@ -158,18 +147,7 @@ class PerpOrder {
         throw "invalid position effect type";
     }
 
-    let order_side;
-    switch (this.order_side) {
-      case "Long":
-        order_side = 1;
-        break;
-      case "Short":
-        order_side = 0;
-        break;
-
-      default:
-        throw "invalid position effect type";
-    }
+    let order_side = order_side == "Long";
 
     let open_order_fields = this.open_order_fields
       ? this.open_order_fields.toGrpcObject()
@@ -179,7 +157,7 @@ class PerpOrder {
       : null;
 
     if (this.position) {
-      this.position.order_side = this.position.order_side == "Long" ? 1 : 0;
+      this.position.order_side = this.position.order_side == "Long";
     }
 
     return {
