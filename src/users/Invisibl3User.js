@@ -3,7 +3,7 @@ const {
 } = require("../transactions/orderStructs/LiquidationOrder");
 
 const { hash2, computeHashOnElements } = require("../utils/crypto_hash.js");
-const { sign, getKeyPair } = require("starknet").ec;
+const { getKeyPair } = require("starknet").ec;
 
 const {
   _subaddressPrivKeys,
