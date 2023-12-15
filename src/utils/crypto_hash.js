@@ -1,6 +1,7 @@
 // Import the Rust-generated WebAssembly package
 const PoseidonHash = require("../../poseidon_pkg/poseidon");
 
+
 function hash2(vec2) {
   let h = PoseidonHash.poseidon_hash_js(vec2[0].toString(), vec2[1].toString());
 

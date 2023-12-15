@@ -23,14 +23,14 @@ class LiquidationOrder {
   }
 
   hashOrder() {
-    let order_side = order_side == "Long";
+    let order_side = this.order_side == "Long";
 
     let position_address = this.position.position_header.position_address;
     let fields_hash = this.open_order_fields.hash();
 
     let hash_inputs = [
       position_address,
-      order_side,
+      order_side ? 1n : 0n,
       this.synthetic_token,
       this.synthetic_amount,
       this.collateral_amount,
@@ -59,7 +59,7 @@ class LiquidationOrder {
   }
 
   toGrpcObject() {
-    let order_side = order_side == "Long";
+    let order_side = this.order_side == "Long";
 
     let open_order_fields = this.open_order_fields.toGrpcObject();
 

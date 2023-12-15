@@ -32,7 +32,7 @@ class PerpOrder {
   }
 
   hashOrder() {
-    let order_side = order_side == "Long";
+    let order_side = this.order_side == "Long";
 
     let pos_effect_type_int;
     switch (this.position_effect_type) {
@@ -72,7 +72,7 @@ class PerpOrder {
       this.expiration_timestamp,
       position_address,
       pos_effect_type_int,
-      order_side,
+      order_side ? 1n : 0n,
       this.synthetic_token,
       this.synthetic_amount,
       this.collateral_amount,
@@ -147,7 +147,7 @@ class PerpOrder {
         throw "invalid position effect type";
     }
 
-    let order_side = order_side == "Long";
+    let order_side = this.order_side == "Long";
 
     let open_order_fields = this.open_order_fields
       ? this.open_order_fields.toGrpcObject()

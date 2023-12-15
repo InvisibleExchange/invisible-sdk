@@ -1,19 +1,3 @@
 node_modules
 
-config.json
-perp_config.json
-engine.proto
-
-.env
-
-src/utils/firebase
-!src/utils/firebase/firebaseConnection.js
-
-user_info.db
-
-mm-btc-usd/perp_config.json
-mm-btc-usd/spot_config.json
-mm-eth-usd/perp_config.json
-mm-eth-usd/spot_config.json
-liquidator-bot/config.json
-
+test.js

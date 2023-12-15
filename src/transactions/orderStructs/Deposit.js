@@ -35,7 +35,7 @@ module.exports = class Deposit {
   static signDeposit(deposit_id, notes, pk) {
     let hashes = notes.map((n) => n.hashNote());
 
-    hashes.unshift(deposit_id);
+    hashes.push(deposit_id);
 
     let deposit_hash = computeHashOnElements(hashes);
 

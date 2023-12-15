@@ -119,13 +119,14 @@ class PositionHeader {
     this.hash = this.hash();
   }
 
-  // & hash = H({allow_partial_liquidations, synthetic_token, position_address,  vlp_token * 2**32 + max_vlp_supply})
+  // & hash = H({allow_partial_liquidations, synthetic_token, position_address, vlp_token, max_vlp_supply})
   hash() {
     let hashInputs = [
       this.allow_partial_liquidations ? 1n : 0n,
       this.synthetic_token,
       this.position_address,
-      this.vlp_token * 2n ** 32n + this.max_vlp_supply,
+      this.vlp_token,
+      this.max_vlp_supply,
     ];
 
     return computeHashOnElements(hashInputs);

@@ -1,13 +1,6 @@
 const axios = require("axios");
 
-const {
-  SERVER_URL,
-  COLLATERAL_TOKEN_DECIMALS,
-  DECIMALS_PER_ASSET,
-  PRICE_DECIMALS_PER_ASSET,
-  SPOT_MARKET_IDS_2_TOKENS,
-  PERP_MARKET_IDS_2_TOKENS,
-} = require("../utils/utils");
+const { SERVER_URL } = require("../utils/utils");
 
 const {
   _sendWithdrawalInner,
