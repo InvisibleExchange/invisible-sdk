@@ -198,6 +198,7 @@ module.exports = class UserState {
             return { pk: pk, address: getKeyPair(pk).getPublic() };
           })
         : [];
+      
     let { emptyTabPrivKeys, orderTabData, tabPrivKeys } =
       await fetchOrderTabData(tabPkData, this.privateSeed);
 

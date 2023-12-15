@@ -235,32 +235,11 @@ async function fetchStoredTabs(address, baseBlinding, quoteBlinding) {
       throw "Invalid quote amount and blinding";
     }
 
-    let vlpSupply = 0;
-    if (tabData.vlp_supply_commitment > 0) {
-      let b1 = BigInt(baseBlinding) % 2n ** 128n;
-      let b2 = BigInt(quoteBlinding) % 2n ** 128n;
-
-      let blindingSum = b1 + b2;
-      let vlpHash8 = trimHash(blindingSum, 64);
-      vlpSupply = Number.parseInt(
-        bigInt(tabData.vlp_supply_hidden_amount).xor(vlpHash8).value
-      );
-
-      if (
-        hash2([BigInt(vlpSupply), blindingSum]) != tabData.vlp_supply_commitment
-      ) {
-        throw "Invalid vlp amount and blinding";
-      }
-    }
-
     let tabHeader = new TabHeader(
-      tabData.is_smart_contract,
       tabData.base_token,
       tabData.quote_token,
       baseBlinding,
       quoteBlinding,
-      tabData.vlp_token,
-      tabData.max_vlp_supply,
       tabData.pub_key
     );
     let orderTab = new OrderTab(
@@ -268,7 +247,6 @@ async function fetchStoredTabs(address, baseBlinding, quoteBlinding) {
       tabHeader,
       baseAmount,
       quoteAmount,
-      vlpSupply
     );
 
     orderTabs.push(orderTab);
