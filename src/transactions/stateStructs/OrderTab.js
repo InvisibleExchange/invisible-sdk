@@ -5,12 +5,11 @@ const { getKeyPair, sign } = require("starknet").ec;
 //* ORDER TABS
 
 class OrderTab {
-  constructor(tab_idx, tab_header, base_amount, quote_amount, vlp_supply) {
+  constructor(tab_idx, tab_header, base_amount, quote_amount) {
     this.tab_idx = tab_idx;
     this.tab_header = tab_header;
     this.base_amount = base_amount;
     this.quote_amount = quote_amount;
-    this.vlp_supply = vlp_supply;
     this.hash = this.hash();
   }
 
@@ -29,8 +28,7 @@ class OrderTab {
     base_blinding,
     quote_blinding,
     base_amount,
-    quote_amount,
-    vlpSupply
+    quote_amount
   ) {
     let base_commitment = hash2([BigInt(base_amount), BigInt(base_blinding)]);
     let quote_commitment = hash2([
@@ -38,16 +36,7 @@ class OrderTab {
       BigInt(quote_blinding),
     ]);
 
-    let blindingSum = BigInt(base_blinding) / 2n + BigInt(quote_blinding) / 2n;
-    let vlpSupplyCommitment =
-      vlpSupply > 0 ? hash2(BigInt(vlpSupply), blindingSum) : 0n;
-
-    let hashInputs = [
-      header_hash,
-      base_commitment,
-      quote_commitment,
-      vlpSupplyCommitment,
-    ];
+    let hashInputs = [header_hash, base_commitment, quote_commitment];
 
     return computeHashOnElements(hashInputs);
   }
@@ -58,7 +47,6 @@ class OrderTab {
       tab_header: this.tab_header.toGrpcObject(),
       base_amount: this.base_amount,
       quote_amount: this.quote_amount,
-      vlp_supply: this.vlp_supply,
     };
   }
 
@@ -69,8 +57,7 @@ class OrderTab {
       grpcMessage.tab_idx,
       tabHeader,
       grpcMessage.base_amount,
-      grpcMessage.quote_amount,
-      grpcMessage.vlp_supply
+      grpcMessage.quote_amount
     );
   }
 
@@ -106,62 +93,37 @@ class OrderTab {
 }
 
 class TabHeader {
-  constructor(
-    is_smart_contract,
-    base_token,
-    quote_token,
-    base_blinding,
-    quote_blinding,
-    vlp_token,
-    max_vlp_supply,
-    pub_key
-  ) {
-    this.is_smart_contract = is_smart_contract;
+  constructor(base_token, quote_token, base_blinding, quote_blinding, pub_key) {
     this.base_token = base_token;
     this.quote_token = quote_token;
     this.base_blinding = BigInt(base_blinding);
     this.quote_blinding = BigInt(quote_blinding);
-    this.vlp_token = vlp_token;
-    this.max_vlp_supply = max_vlp_supply;
     this.pub_key = BigInt(pub_key);
   }
 
-  // & header_hash = H({ is_smart_contract, base_token, quote_token, vlp_token, max_vlp_supply, pub_key})
+  // & header_hash = H({ base_token, quote_token, pub_key})
   hash() {
-    let hashInputs = [
-      this.is_smart_contract ? 1n : 0n,
-      this.base_token,
-      this.quote_token,
-      this.vlp_token,
-      this.max_vlp_supply,
-      this.pub_key,
-    ];
+    let hashInputs = [this.base_token, this.quote_token, this.pub_key];
 
     return computeHashOnElements(hashInputs);
   }
 
   toGrpcObject() {
     return {
-      is_smart_contract: this.is_smart_contract,
       base_token: this.base_token,
       quote_token: this.quote_token,
       base_blinding: this.base_blinding.toString(),
       quote_blinding: this.quote_blinding.toString(),
-      vlp_token: this.vlp_token,
-      max_vlp_supply: this.max_vlp_supply,
       pub_key: this.pub_key.toString(),
     };
   }
 
   static fromGrpcObject(grpcMessage) {
     return new TabHeader(
-      grpcMessage.is_smart_contract,
       grpcMessage.base_token,
       grpcMessage.quote_token,
       grpcMessage.base_blinding,
       grpcMessage.quote_blinding,
-      grpcMessage.vlp_token,
-      grpcMessage.max_vlp_supply,
       grpcMessage.pub_key
     );
   }
