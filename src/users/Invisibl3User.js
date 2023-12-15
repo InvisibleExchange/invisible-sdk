@@ -903,16 +903,13 @@ module.exports = class UserState {
     this.tabPrivKeys[tabAddress.getX().toString()] = tabPrivKey;
 
     let tabHeader = new TabHeader(
-      false,
       baseToken,
       quoteToken,
       baseBlinding,
       quoteBlinding,
-      0,
-      0,
       tabAddress.getX().toString()
     );
-    let orderTab = new OrderTab(0, tabHeader, baseAmount, quoteAmount, 0);
+    let orderTab = new OrderTab(0, tabHeader, baseAmount, quoteAmount);
 
     let signature = orderTab.signOpenTabOrder(
       baseNotesIn.map((n) => n.privKey),

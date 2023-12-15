@@ -23,11 +23,6 @@ const {
   _sendOpenOrderTabInner,
   _sendModifyOrderTabInner,
 } = require("./contructOrders/orderTabs");
-const { Note } = require("./stateStructs/Notes");
-const { storeUserState } = require("../utils/localStorage");
-const { OrderTab } = require("./stateStructs/OrderTab");
-
-const EXPRESS_APP_URL = `http://${SERVER_URL}:4000`; // process.env.EXPRESS_APP_URL;
 
 /**
  * This constructs a spot swap and sends it to the backend
