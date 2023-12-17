@@ -198,7 +198,7 @@ module.exports = class UserState {
             return { pk: pk, address: getKeyPair(pk).getPublic() };
           })
         : [];
-      
+
     let { emptyTabPrivKeys, orderTabData, tabPrivKeys } =
       await fetchOrderTabData(tabPkData, this.privateSeed);
 
@@ -1292,7 +1292,7 @@ module.exports = class UserState {
   }
 
   static fromPrivKey(privKey_) {
-    privKey_ = privKey_.toString();
+    privKey_ = privKey_.toString(16);
 
     try {
       if (!privKey_.startsWith("0x")) privKey_ = "0x" + privKey_;
