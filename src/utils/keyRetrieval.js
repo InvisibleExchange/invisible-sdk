@@ -2,6 +2,7 @@ const EXCHANGE_CONFIG = require("../../exchange-config.json");
 
 const PRICE_DECIMALS_PER_ASSET = EXCHANGE_CONFIG["PRICE_DECIMALS_PER_ASSET"];
 const IDS_TO_SYMBOLS = EXCHANGE_CONFIG["IDS_TO_SYMBOLS"];
+const ASSETS = EXCHANGE_CONFIG["ASSETS"];
 
 const {
   checkNoteExistance,
@@ -18,11 +19,7 @@ const { storeUserState } = require("./localStorage");
  * @param {"note"|"position"|"order_tab"} type
  * @param {number[]} tokens
  */
-async function restoreKeyData(
-  user,
-  type = "note",
-  tokens = [12345, 54321, 55555]
-) {
+async function restoreKeyData(user, type = "note", tokens = ASSETS) {
   // ? Get all the addresses from the datatbase =====
 
   switch (type) {

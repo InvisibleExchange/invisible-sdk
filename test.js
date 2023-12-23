@@ -1,4 +1,5 @@
 const { Note, trimHash } = require("./src/transactions/stateStructs/Notes.js");
+const UserState = require("./src/users/Invisibl3User.js");
 let BTC_hex =
   "0xda8562e7abc01a6f0d49a25d144ce6a9d7752a079c5d950ad5a93fd6d623f7fd";
 let ETH_hex =

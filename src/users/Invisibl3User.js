@@ -22,22 +22,12 @@ const {
   getActiveOrders,
 } = require("./utils/userData.js");
 
-const DUST_AMOUNT_PER_ASSET = {
-  12345: 2500, // BTC ~ 5c
-  54321: 25000, // ETH ~ 5c
-  55555: 50000, // USDC ~ 5c
-};
-const COLLATERAL_TOKEN = 55555;
-const SPOT_MARKET_IDS_2_TOKENS = {
-  11: { base: 12345, quote: 55555 },
-  12: { base: 54321, quote: 55555 },
-};
+const EXCHANGE_CONFIG = require("../../exchange-config.json");
 
-const CHAIN_IDS = {
-  "ETH Mainnet": 9090909,
-  Starknet: 7878787,
-  ZkSync: 5656565,
-};
+const DUST_AMOUNT_PER_ASSET = EXCHANGE_CONFIG["DUST_AMOUNT_PER_ASSET"];
+const COLLATERAL_TOKEN = EXCHANGE_CONFIG["COLLATERAL_TOKEN"];
+const SPOT_MARKET_IDS_2_TOKENS = EXCHANGE_CONFIG["SPOT_MARKET_IDS_2_TOKENS"];
+const CHAIN_IDS = EXCHANGE_CONFIG["CHAIN_IDS"];
 
 const { Note, trimHash } = require("../transactions/stateStructs/Notes.js");
 const {
