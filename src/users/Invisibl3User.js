@@ -53,6 +53,9 @@ const {
   initDb,
 } = require("../utils/localStorage.js");
 const { restoreUserState } = require("../utils/keyRetrieval.js");
+const {
+  fetchOnchainDeposits,
+} = require("../utils/firebase/firebaseConnection.js");
 
 /* global BigInt */
 
@@ -105,6 +108,9 @@ module.exports = class UserState {
     this.orderIds = [];
     this.perpetualOrderIds = [];
 
+    this.depositIds = []; // these ids are in encrypted format
+    this.deposits = []; // {depositId, tokenId, depositAmount, starkKey, timestamp, txHash}
+
     this.orders = []; // {base_asset,expiration_timestamp,fee_limit,notes_in,order_id,order_side,price,qty_left,quote_asset,refund_note}
     this.perpetualOrders = []; // {order_id,expiration_timestamp,qty_left,price,synthetic_token,order_side,position_effect_type,fee_limit,position_address,notes_in,refund_note,initial_margin}
 
@@ -154,6 +160,14 @@ module.exports = class UserState {
       userData.privKeys.length > 0
         ? userData.privKeys.map((pk) => getKeyPair(pk))
         : [];
+
+    // ? Get Pending Deposits =====================================
+    let { deposits, newDepositIds } = await fetchOnchainDeposits(
+      userData.depositIds,
+      this.privateSeed
+    );
+    this.deposits = deposits ?? [];
+    this.depositIds = newDepositIds ?? [];
 
     let { emptyPrivKeys, noteData, notePrivKeys, error } = await fetchNoteData(
       keyPairs,

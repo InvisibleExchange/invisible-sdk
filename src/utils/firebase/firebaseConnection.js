@@ -32,6 +32,7 @@ const PRICE_DECIMALS_PER_ASSET = {
 
 /* global BigInt */
 
+// * ------------------------------------------------- * //
 async function getAddressIndexes(address) {
   const querySnapshot = await getDocs(
     collection(db, `addr2idx/addresses/${address}`)
@@ -51,6 +52,7 @@ async function getAddressIndexes(address) {
   return indexes;
 }
 
+// * ------------------------------------------------- * //
 // ---- NOTES ---- //
 async function fetchStoredNotes(address, blinding) {
   // Address should be the x coordinate of the address in decimal format
@@ -106,6 +108,7 @@ async function checkNoteExistance(address) {
   return indexes && indexes.length > 0;
 }
 
+// * ------------------------------------------------- * //
 // ---- POSITIONS ---- //
 async function fetchStoredPosition(address) {
   // returns the position at this address from the db
@@ -200,6 +203,7 @@ async function getLiquidatablePositions(indexPrice, token) {
   return positions;
 }
 
+// * ------------------------------------------------- * //
 // ---- ORDER TABS ---- //
 async function fetchStoredTabs(address, baseBlinding, quoteBlinding) {
   // Address should be the x coordinate of the address in decimal format
@@ -246,7 +250,7 @@ async function fetchStoredTabs(address, baseBlinding, quoteBlinding) {
       tabData.index,
       tabHeader,
       baseAmount,
-      quoteAmount,
+      quoteAmount
     );
 
     orderTabs.push(orderTab);
@@ -263,6 +267,7 @@ async function checkOrderTabExistance(address) {
   return indexes && indexes.length > 0;
 }
 
+// * ------------------------------------------------- * //
 // ---- USER INFO ---- //
 async function registerUser(userId) {
   let userAddressesDoc = doc(db, "users", userId.toString());
@@ -299,6 +304,7 @@ async function storeUserData(userId, noteCounts, positionCounts) {
   });
 }
 
+// * ------------------------------------------------- * //
 async function storePrivKey(userId, privKey, isPosition, privateSeed) {
   let docRef;
 
@@ -334,6 +340,7 @@ async function removePrivKey(userId, privKey, isPosition, privateSeed) {
   await setDoc(docRef2, {});
 }
 
+// * ------------------------------------------------- * //
 async function storeOrderId(
   userId,
   orderId,
@@ -382,6 +389,33 @@ async function removeOrderId(userId, orderId, isPerp, privateSeed) {
   let docRef2 = doc(db, `users/${userId}/deprecatedOrderIds`, encryptedOrderId);
   await setDoc(docRef2, {});
 }
+
+// * ------------------------------------------------- * //
+
+async function fetchOnchainDeposits(depositIds, privateSeed) {
+  if (!depositIds || depositIds.length == 0) {
+    return [];
+  }
+
+  let newDepositIds = [];
+  let deposits = [];
+  for (const depositId of depositIds) {
+    let depositDoc = doc(db, "deposits", depositId);
+    let depositData = await getDoc(depositDoc);
+
+    if (!depositData.exists()) {
+      continue;
+    }
+
+    newDepositIds.push(depositId);
+
+    deposits.push(depositData.data());
+  }
+
+  return { deposits, newDepositIds };
+}
+
+// * ------------------------------------------------- * //
 
 async function fetchUserData(userId, privateSeed) {
   //& stores privKey : [address.x, address.y]
@@ -483,6 +517,8 @@ async function fetchUserData(userId, privateSeed) {
   };
 }
 
+// * ------------------------------------------------- * //
+
 // ---- FILLS ---- //
 async function fetchUserFills(user_id_) {
   let user_id = trimHash(user_id_, 64).toString();
@@ -558,9 +594,7 @@ async function fetchUserFills(user_id_) {
   return fills;
 }
 
-/**
- * @param {} n number of fills to fetch
- */
+// * ------------------------------------------------- * //
 async function fetchLatestFills(n, isPerp, token) {
   let q;
   if (isPerp) {
@@ -605,8 +639,9 @@ module.exports = {
   removePrivKey,
   storeOrderId,
   removeOrderId,
-  // fetchDeprecatedKeys,
-  //
+
+  fetchOnchainDeposits,
+
   checkNoteExistance,
   checkPositionExistance,
   checkOrderTabExistance,

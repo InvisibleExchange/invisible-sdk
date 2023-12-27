@@ -9,6 +9,7 @@ async function initDb() {
     tabPrivKeys TEXT,
     orderIds TEXT,
     perpetualOrderIds TEXT,
+    depositIds TEXT,
     noteCounts TEXT,
     positionCounts TEXT,
     orderTabCounts TEXT
@@ -44,6 +45,7 @@ function storeUserState(db, user) {
 
   let orderIds = JSON.stringify(user.orderIds);
   let perpetualOrderIds = JSON.stringify(user.perpetualOrderIds);
+  let depositIds = JSON.stringify(user.depositIds);
 
   let noteCounts = JSON.stringify(user.noteCounts);
   let positionCounts = JSON.stringify(user.positionCounts);
@@ -58,9 +60,10 @@ function storeUserState(db, user) {
         tabPrivKeys,
         orderIds,
         perpetualOrderIds,
+        depositIds,
         noteCounts,
         positionCounts,
-        orderTabCounts) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`,
+        orderTabCounts) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`,
       [
         userId.toString(),
         privKeys,
@@ -68,6 +71,7 @@ function storeUserState(db, user) {
         tabPrivKeys,
         orderIds,
         perpetualOrderIds,
+        depositIds,
         noteCounts,
         positionCounts,
         orderTabCounts,
@@ -112,6 +116,8 @@ function getUserState(db, userId) {
       let perpetualOrderIds = correctRow
         ? JSON.parse(correctRow?.perpetualOrderIds)
         : [];
+      let depositIds = correctRow ? JSON.parse(correctRow?.depositIds) : [];
+
       let noteCounts = correctRow ? JSON.parse(correctRow?.noteCounts) : {};
       let positionCounts = correctRow
         ? JSON.parse(correctRow?.positionCounts)
@@ -126,6 +132,7 @@ function getUserState(db, userId) {
         tabPrivKeys,
         orderIds,
         perpetualOrderIds,
+        depositIds,
         noteCounts,
         positionCounts,
         orderTabCounts,
