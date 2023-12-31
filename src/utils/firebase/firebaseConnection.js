@@ -619,6 +619,21 @@ async function fetchLatestFills(n, isPerp, token) {
   return fills;
 }
 
+// * ------------------------------------------------- * //
+
+async function fetchOnchainMMActions(positionAddress) {
+  let q = query(
+    collection(db, `mm_actions`),
+    where("positionAddress", "==", positionAddress.toString())
+  );
+
+  const querySnapshot = await getDocs(q);
+
+  let mmActions = querySnapshot.docs.map((doc) => doc.data());
+
+  return mmActions;
+}
+
 // ================================================================
 
 // ---- POSITIONS ---- //
@@ -641,6 +656,7 @@ module.exports = {
   removeOrderId,
 
   fetchOnchainDeposits,
+  fetchOnchainMMActions,
 
   checkNoteExistance,
   checkPositionExistance,

@@ -55,6 +55,7 @@ const {
 const { restoreUserState } = require("../utils/keyRetrieval.js");
 const {
   fetchOnchainDeposits,
+  fetchOnchainMMActions,
 } = require("../utils/firebase/firebaseConnection.js");
 
 /* global BigInt */
@@ -362,6 +363,10 @@ module.exports = class UserState {
     this.noteData = noteDataNew;
 
     await storeUserState(this.db, this).catch(console.log);
+  }
+
+  async fetchOnchainMMActions(positionAddress) {
+    return await fetchOnchainMMActions(positionAddress);
   }
 
   //* GENERATE ORDERS  ==========================================================
