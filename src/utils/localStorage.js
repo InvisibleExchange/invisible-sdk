@@ -1,4 +1,7 @@
 const sqlite3 = require("sqlite3").verbose();
+const path = require("path");
+
+// function name(params) {}
 
 async function initDb() {
   const createTableCommand = `
@@ -15,7 +18,8 @@ async function initDb() {
     orderTabCounts TEXT
     )`;
 
-  let db = new sqlite3.Database("../user_info.db", (err) => {
+  let storagePath = path.join(__dirname, "../../user_info.db");
+  let db = new sqlite3.Database(storagePath, (err) => {
     if (err) {
       console.error(err.message);
     }

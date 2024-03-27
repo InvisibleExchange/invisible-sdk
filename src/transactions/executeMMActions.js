@@ -2,33 +2,18 @@ const axios = require("axios");
 
 const { sign, getKeyPair } = require("starknet").ec;
 
-const grpc = require("@grpc/grpc-js");
-const protoLoader = require("@grpc/proto-loader");
 const { computeHashOnElements } = require("invisible-sdk/src/utils");
 
 const EXCHANGE_CONFIG = require("../../exchange-config.json");
 
-const SERVER_URL = EXCHANGE_CONFIG["SERVER_URL"];
 const EXPRESS_APP_URL = EXCHANGE_CONFIG["EXPRESS_APP_URL"];
 const PERP_MARKET_IDS = EXCHANGE_CONFIG["PERP_MARKET_IDS"];
 
-const packageDefinition = protoLoader.loadSync("../engine.proto", {
-  keepCase: true,
-  longs: String,
-  enums: String,
-  defaults: true,
-  oneofs: true,
-});
-const engine = grpc.loadPackageDefinition(packageDefinition).engine;
-
-let client = new engine.Engine(SERVER_URL, grpc.credentials.createInsecure());
-
 /**
  * mmAction: {
- *  mm_owner,
+ * mm_owner,
  * synthetic_asset,
  * position_address,
- * max_vlp_supply,
  * vlp_token,
  * action_id,
  * action_type,
@@ -39,46 +24,48 @@ async function registerMM(marketMaker, mmAction) {
   }
 
   let position = marketMaker.positionData[mmAction.synthetic_asset].find(
-    (pos) => pos.position_header.position_address === mmAction.position_address
+    (pos) => pos.position_header.position_address == mmAction.position_address
   );
   if (!position) {
     throw new Error("Invalid position address");
   }
 
-  position.order_side = position.order_side === "Long";
+  position.order_side = position.order_side == "Long";
 
   let posPrivKey =
     marketMaker.positionPrivKeys[position.position_header.position_address];
 
-  // & H = H({position.hash, vlp_token, max_vlp_supply})
+  // & H = H({position.hash, vlp_token})
   let messageHash = computeHashOnElements([
     position.hash,
     mmAction.vlp_token,
-    mmAction.max_vlp_supply,
   ]);
 
   let keyPair = getKeyPair(posPrivKey);
   let sig = sign(keyPair, "0x" + messageHash.toString(16));
   let marketId = PERP_MARKET_IDS[mmAction.synthetic_asset];
 
+
   let registerMessage = {
     position: position,
     vlp_token: mmAction.vlp_token,
-    max_vlp_supply: mmAction.max_vlp_supply,
     signature: { r: sig[0], s: sig[1] },
     market_id: marketId,
     synthetic_token: mmAction.synthetic_asset,
+    mm_action_id: mmAction.action_id,
   };
 
-  await axios
+ 
+
+  return await axios
     .post(`${EXPRESS_APP_URL}/register_onchain_mm`, registerMessage)
     .then((res) => {
       let response = res.data.response;
 
       if (response.successful) {
-        console.log("response", response);
+        return response;
       } else {
-        let msg = "Withdrawal failed with error: \n" + response.error_message;
+        let msg = "Register failed with error: \n" + response.error_message;
 
         throw new Error(msg);
       }
@@ -102,7 +89,7 @@ async function addLiquidity(marketMaker, mmAction) {
   for (let syntheticToken of Object.keys(marketMaker.positionData)) {
     position = marketMaker.positionData[syntheticToken].find(
       (pos) =>
-        pos.position_header.position_address === mmAction.position_address
+        pos.position_header.position_address == mmAction.position_address
     );
     if (position) {
       break;
@@ -112,7 +99,7 @@ async function addLiquidity(marketMaker, mmAction) {
     throw new Error("Invalid position address");
   }
 
-  position.order_side = position.order_side === "Long";
+  position.order_side = position.order_side == "Long";
 
   let posPrivKey =
     marketMaker.positionPrivKeys[position.position_header.position_address];
@@ -131,19 +118,28 @@ async function addLiquidity(marketMaker, mmAction) {
   let addLiqMessage = {
     position,
     depositor: mmAction.depositor,
-    initial_value: mmAction.usdc_amount,
+    initial_value: mmAction.usdc_amount.toString(),
     signature: { r: sig[0], s: sig[1] },
     market_id: marketId,
     synthetic_token: position.position_header.synthetic_token,
+    mm_action_id: mmAction.action_id,
   };
 
-  await client.add_liquidity_mm(addLiqMessage, function (err, response) {
-    if (err) {
-      console.log(err);
-    } else {
-      console.log("response", response);
-    }
-  });
+  return await axios
+    .post(`${EXPRESS_APP_URL}/add_liquidity_mm`, addLiqMessage)
+    .then((res) => {
+      let response = res.data.response;
+
+      if (response.successful) {
+        return response;
+      } else {
+        let msg =
+          "add liquidity failed with error: \n" + response.error_message;
+
+          throw new Error("stop");
+        // throw new Error(msg);
+      }
+    });
 }
 
 /**
@@ -164,7 +160,7 @@ async function removeLiquidity(marketMaker, mmAction) {
   for (let syntheticToken of Object.keys(marketMaker.positionData)) {
     position = marketMaker.positionData[syntheticToken].find(
       (pos) =>
-        pos.position_header.position_address === mmAction.position_address
+        pos.position_header.position_address == mmAction.position_address
     );
     if (position) {
       break;
@@ -174,7 +170,7 @@ async function removeLiquidity(marketMaker, mmAction) {
     throw new Error("Invalid position address");
   }
 
-  position.order_side = position.order_side === "Long";
+  position.order_side = position.order_side == "Long";
 
   let posPrivKey =
     marketMaker.positionPrivKeys[position.position_header.position_address];
@@ -194,20 +190,28 @@ async function removeLiquidity(marketMaker, mmAction) {
   let removeLiqMessage = {
     position,
     depositor: mmAction.depositor,
-    initial_value: mmAction.initial_value,
-    vlp_amount: mmAction.vlp_amount,
+    initial_value: mmAction.initial_value.toString(),
+    vlp_amount: mmAction.vlp_amount.toString(),
     signature: { r: sig[0], s: sig[1] },
     market_id: marketId,
     synthetic_token: position.position_header.synthetic_token,
+    mm_action_id: mmAction.action_id,
   };
 
-  await client.remove_liquidity_mm(removeLiqMessage, function (err, response) {
-    if (err) {
-      console.log(err);
-    } else {
-      console.log("response", response);
-    }
-  });
+  return await axios
+    .post(`${EXPRESS_APP_URL}/remove_liquidity_mm`, removeLiqMessage)
+    .then((res) => {
+      let response = res.data.response;
+
+      if (response.successful) {
+        return response;
+      } else {
+        let msg =
+          "remove_liquidity  failed with error: \n" + response.error_message;
+
+        throw new Error(msg);
+      }
+    });
 }
 
 /**
@@ -228,7 +232,7 @@ async function closeMM(marketMaker, mmAction) {
   for (let syntheticToken of Object.keys(marketMaker.positionData)) {
     position = marketMaker.positionData[syntheticToken].find(
       (pos) =>
-        pos.position_header.position_address === mmAction.position_address
+        pos.position_header.position_address == mmAction.position_address
     );
     if (position) {
       break;
@@ -238,7 +242,7 @@ async function closeMM(marketMaker, mmAction) {
     throw new Error("Invalid position address");
   }
 
-  position.order_side = position.order_side === "Long";
+  position.order_side = position.order_side == "Long";
 
   let posPrivKey =
     marketMaker.positionPrivKeys[position.position_header.position_address];
@@ -256,20 +260,28 @@ async function closeMM(marketMaker, mmAction) {
 
   let closeMmMessage = {
     position,
-    initial_value_sum: mmAction.initial_value_sum,
-    vlp_amount_sum: mmAction.vlp_amount_sum,
+    initial_value_sum: mmAction.initial_value_sum.toString(),
+    vlp_amount_sum: mmAction.vlp_amount_sum.toString(),
     signature: { r: sig[0], s: sig[1] },
     market_id: marketId,
     synthetic_token: position.position_header.synthetic_token,
+    mm_action_id: mmAction.action_id,
   };
 
-  await client.close_onchain_mm(closeMmMessage, function (err, response) {
-    if (err) {
-      console.log(err);
-    } else {
-      console.log("response", response);
-    }
-  });
+  return await axios
+    .post(`${EXPRESS_APP_URL}/close_onchain_mm`, closeMmMessage)
+    .then((res) => {
+      let response = res.data.response;
+
+      if (response.successful) {
+        return response;
+      } else {
+        let msg =
+          "close_onchain_mm failed with error: \n" + response.error_message;
+
+        throw new Error(msg);
+      }
+    });
 }
 
 module.exports = {

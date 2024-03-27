@@ -196,7 +196,8 @@ module.exports = class UserState {
       await restoreUserState(this, false, true).catch(console.log);
     }
 
-    // ? Get Position Data ============================================
+    // ? Get Tab Data ============================================
+
     let tabPkData =
       userData.tabPrivKeys.length > 0
         ? userData.tabPrivKeys.map((pk) => {
@@ -705,9 +706,16 @@ module.exports = class UserState {
   makeWithdrawalOrder(
     withdrawAmount,
     withdrawToken,
-    withdrawStarkKey,
-    withdrawalChainId
+    withdrawalAddress,
+    withdrawalChainId,
+    maxGasFee
   ) {
+    if (!withdrawalAddress) return null;
+    if (withdrawalAddress.toString().startsWith("0x")) {
+      withdrawalAddress = BigInt(withdrawalAddress, 16);
+    }
+    if (!maxGasFee) maxGasFee = 0n;
+
     // ? Get the notesIn and priv keys for these notes
     let { notesIn, refundAmount } = this.getNotesInAndRefundAmount(
       withdrawToken,
@@ -733,15 +741,17 @@ module.exports = class UserState {
       notesIn,
       privKeys,
       refundNote,
-      withdrawStarkKey,
-      withdrawalChainId
+      withdrawalAddress,
+      withdrawalChainId,
+      maxGasFee
     );
 
     let withdrawal = new Withdrawal(
       withdrawalChainId,
       withdrawToken,
       withdrawAmount,
-      withdrawStarkKey,
+      withdrawalAddress,
+      maxGasFee,
       notesIn,
       refundNote,
       signature
@@ -944,6 +954,9 @@ module.exports = class UserState {
       market_id: marketId,
     };
 
+    // ? Store the userData locally
+    storeUserState(this.db, this).catch(console.log);
+
     return grpcMessage;
   }
 
@@ -980,6 +993,9 @@ module.exports = class UserState {
       quoteCloseOrderFields,
       tabPrivKey
     );
+
+    // ? Store the userData locally
+    storeUserState(this.db, this).catch(console.log);
 
     return {
       orderTab,
@@ -1056,6 +1072,9 @@ module.exports = class UserState {
         isAdd
       );
 
+      // ? Store the userData locally
+      storeUserState(this.db, this).catch(console.log);
+
       return {
         orderTab,
         baseNotesIn,
@@ -1085,6 +1104,9 @@ module.exports = class UserState {
         quoteCloseOrderFields,
         isAdd
       );
+
+      // ? Store the userData locally
+      storeUserState(this.db, this).catch(console.log);
 
       return {
         orderTab,

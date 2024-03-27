@@ -41,12 +41,13 @@ async function _sendDepositInner(user, depositId, amount, token, pubKey) {
 
 async function _sendWithdrawalInner(
   user,
-  withdrawalChainId,
   amount,
   token,
-  starkKey
+  recipient,
+  withdrawalChainId,
+  maxGasFee
 ) {
-  if (!user || !amount || !token || !withdrawalChainId || !starkKey) {
+  if (!user || !amount || !token || !withdrawalChainId || !recipient) {
     throw new Error("Invalid input");
   }
 
@@ -56,8 +57,9 @@ async function _sendWithdrawalInner(
   let withdrawal = user.makeWithdrawalOrder(
     amount,
     token,
-    starkKey,
-    withdrawalChainId
+    recipient,
+    withdrawalChainId,
+    maxGasFee
   );
 
   await axios

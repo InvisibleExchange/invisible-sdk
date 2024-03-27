@@ -18,13 +18,13 @@ const { getFirestore } = require("firebase/firestore");
 // };
 
 const firebaseConfig = {
-  apiKey: "AIzaSyBphzq0rsi89qwKYzyCiGNeuS-dlm8VWHo",
-  authDomain: "invisible-ec0e0.firebaseapp.com",
-  projectId: "invisible-ec0e0",
-  storageBucket: "invisible-ec0e0.appspot.com",
-  messagingSenderId: "963658677035",
-  appId: "1:963658677035:web:32d6239240b6577855636e",
-  measurementId: "G-WBJ1X0F964",
+  apiKey: "AIzaSyC2ErVSKSg7LG3m2Ty2V34EwBYgDt_EE30",
+  authDomain: "invisibl333.firebaseapp.com",
+  projectId: "invisibl333",
+  storageBucket: "invisibl333.appspot.com",
+  messagingSenderId: "1000403357121",
+  appId: "1:1000403357121:web:ce861b631538baa842f340",
+  measurementId: "G-RD8K36KX2J",
 };
 
 // Initialize Firebase

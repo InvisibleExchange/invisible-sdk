@@ -25,10 +25,8 @@ const {
   OrderTab,
 } = require("../../transactions/stateStructs/OrderTab.js");
 
-const PRICE_DECIMALS_PER_ASSET = {
-  12345: 6, // BTC
-  54321: 6, // ETH
-};
+const EXCHANGE_CONFIG = require("../../../exchange-config.json");
+const PRICE_DECIMALS_PER_ASSET = EXCHANGE_CONFIG["PRICE_DECIMALS_PER_ASSET"];
 
 /* global BigInt */
 
@@ -624,7 +622,7 @@ async function fetchLatestFills(n, isPerp, token) {
 async function fetchOnchainMMActions(positionAddress) {
   let q = query(
     collection(db, `mm_actions`),
-    where("positionAddress", "==", positionAddress.toString())
+    where("position_address", "==", positionAddress.toString())
   );
 
   const querySnapshot = await getDocs(q);

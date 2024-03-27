@@ -234,17 +234,19 @@ async function sendDeposit(user, depositId, amount, token, pubKey) {
 
 async function sendWithdrawal(
   user,
-  withdrawalChainId,
   amount,
   token,
-  starkKey
+  recipient,
+  withdrawalChainId,
+  maxGasFee
 ) {
   return await _sendWithdrawalInner(
     user,
-    withdrawalChainId,
     amount,
     token,
-    starkKey
+    recipient,
+    withdrawalChainId,
+    maxGasFee
   );
 }
 
